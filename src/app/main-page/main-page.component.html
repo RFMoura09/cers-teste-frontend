@@ -1,0 +1,115 @@
+<div class="hidden md:block modal-bg" *ngIf="showConfirmDeleteModal">
+  <div class="modal-card">
+    <p>Do you really want to delete this record?</p>
+    <div class="modal-actions">
+      <button
+        class="btn btn-danger"
+        (click)="closeConfirmDeleteModalAndDelete()"
+      >
+        Yes
+      </button>
+      <button class="btn btn-secondary" (click)="closeConfirmDeleteModal()">
+        No
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="hidden md:block modal-bg" *ngIf="showEditModal">
+  <div class="modal-card w-full">
+    <div class="p-5 grid grid-cols-1 gap-5">
+      <input
+        (keyup)="setCurrentEditTitle($event)"
+        value="{{ currentEditTitle }}"
+        placeholder="Title"
+      />
+      <textarea
+        (keyup)="setCurrentEditDescription($event)"
+        value="{{ currentEditDescription }}"
+        placeholder="Description"
+        rows="10"
+      ></textarea>
+      <div class="modal-actions">
+        <button class="btn" (click)="closeEditModalAndEdit()">Update</button>
+        <button class="btn btn-secondary" (click)="closeEditModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sm-message">
+  <p>Sorry, but this not works on a small screen (<680px)</p>
+</div>
+
+<div class="hidden md:block py-12 bg-blue-600 text-white text-center px-32">
+  <h1 class="text-2xl">Messages Application</h1>
+</div>
+
+<div class="hidden md:block px-32 py-12 space-y-8">
+  <details>
+    <summary>New Message</summary>
+    <div class="p-5 grid grid-cols-1 gap-5">
+      <input
+        (keyup)="setCurrentTitle($event)"
+        value="{{ currentTitle }}"
+        placeholder="Title"
+      />
+      <textarea
+        (keyup)="setCurrentDescription($event)"
+        value="{{ currentDescription }}"
+        placeholder="Description"
+        rows="10"
+      ></textarea>
+      <div class="flex">
+        <button class="btn" (click)="addMessage()">Send</button>
+      </div>
+    </div>
+  </details>
+
+  <hr />
+
+  <details>
+    <summary>Show Messages</summary>
+    <div class="p-5">
+      <table class="w-full">
+        <thead>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+          <th>Actions</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let message of messages">
+            <td>{{ message.id }}</td>
+            <td>{{ message.title }}</td>
+            <td>{{ message.description }}</td>
+            <td>{{ message.createdAt }}</td>
+            <td>{{ message.updatedAt }}</td>
+            <td class="actions">
+              <button (click)="openConfirmDeleteModal(message.id)">
+                delete
+              </button>
+              <button
+                (click)="
+                  openEditModal(message.id, message.title, message.description)
+                "
+              >
+                edit
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p
+        *ngIf="messages.length === 0"
+        class="text-center p-5 border border-gray-300"
+      >
+        There are no records.
+      </p>
+    </div>
+  </details>
+</div>

@@ -1,15 +1,14 @@
+import { MessagesService } from './../services/messages.service';
 import { HttpClient } from '@angular/common/http';
-import { MessagesService } from './services/messages.service';
-import { Message } from './interfaces/message';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  selector: 'app-main-page',
+  templateUrl: './main-page.component.html',
+  styleUrls: ['./main-page.component.css'],
 })
-export class AppComponent {
-  messages: any = [{ id: 0, title: 'title', description: 'desc' }];
+export class MainPageComponent implements OnInit {
+  messages: any = [];
 
   showConfirmDeleteModal: boolean = false;
   showEditModal: boolean = false;
@@ -22,7 +21,11 @@ export class AppComponent {
 
   currentId: number = 0;
 
-  constructor(private http: HttpClient) {}
+  constructor(private messagesService: MessagesService) {}
+
+  ngOnInit(): void {
+    this.getMessages();
+  }
 
   setCurrentTitle(event: any) {
     this.currentTitle = event.target.value;
@@ -41,9 +44,22 @@ export class AppComponent {
   }
 
   getMessages() {
-    this.http
-      .get('http://localhost:8080/messages')
-      .subscribe((res) => (this.messages = res));
+    let newMessages: any = [];
+    this.messagesService.getMessages().subscribe((res: any) => {
+      res.map((m: any) => {
+        newMessages = [
+          ...newMessages,
+          {
+            id: m.id,
+            title: m.title,
+            description: m.description,
+            createdAt: m.createdAt,
+            updatedAt: m.updatedAt,
+          },
+        ];
+      });
+      this.messages = newMessages;
+    });
   }
 
   private clearCurrentInput() {
@@ -58,28 +74,35 @@ export class AppComponent {
 
   addMessage() {
     if (this.currentTitle !== '' && this.currentDescription !== '') {
-      // this.messagesService.addMessage({
-      //   title: this.currentTitle,
-      //   description: this.currentDescription,
-      // });
-      this.getMessages();
-      this.clearCurrentInput();
+      this.messagesService
+        .addMessage({
+          title: this.currentTitle,
+          description: this.currentDescription,
+        })
+        .subscribe((_) => {
+          this.getMessages();
+          this.clearCurrentInput();
+        });
     }
   }
 
   private deleteMessage(id: number) {
-    // this.messagesService.deleteMessage(id);
-    this.getMessages();
+    this.messagesService.deleteMessage(id).subscribe((_) => {
+      this.getMessages();
+    });
   }
 
   private editMessage(id: number) {
     if (this.currentEditTitle !== '' && this.currentEditDescription !== '') {
-      // this.messagesService.updateMessage(id, {
-      //   title: this.currentEditTitle,
-      //   description: this.currentEditDescription,
-      // });
-      this.getMessages();
-      this.clearCurrentEditInput();
+      this.messagesService
+        .updateMessage(id, {
+          title: this.currentEditTitle,
+          description: this.currentEditDescription,
+        })
+        .subscribe((_) => {
+          this.getMessages();
+          this.clearCurrentEditInput();
+        });
     }
   }
 
